@@ -20,7 +20,11 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
 
+    - name: 'Get image tag'
+      id: vars
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
     - name: 'Build and push image to GCP Artefact Registry'
-      run: 'gcloud builds submit --tag ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/containers/o11y_trace_receiver .'
+      run: 'gcloud builds submit --tag ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/containers/o11y_trace_receiver:${{ steps.vars.outputs.sha_short }} .'
 
       
