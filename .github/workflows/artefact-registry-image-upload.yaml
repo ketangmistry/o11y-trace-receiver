@@ -1,11 +1,11 @@
-name: deploy-to-cloud-run
+name: artefact-registry-image-upload
 on: [push]
 
 env:
   GOOGLE_APPLICATION_CREDENTIALS: '${{ secrets.GCP_CREDENTIALS }}'
 
 jobs:
-  gcloud-setup:
+  image-build-and-upload:
     runs-on: ubuntu-latest
     environment: dev
     steps:
