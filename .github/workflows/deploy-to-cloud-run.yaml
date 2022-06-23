@@ -9,10 +9,12 @@ jobs:
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
       with:
-        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+        credentials_json: '${{secrets.GCP_CREDENTIALS}}'
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
 
-    - name: 'Use gcloud CLI'
-      run: 'gcloud info'
+    - name: 'Build and push image to Artefact Registry'
+      run: 'gcloud builds submit --tag ${{secrets.REGION}}-docker.pkg.dev/${{secrets.PROJECT_ID}}/containers/o11y_trace_receiver'
+
+      
