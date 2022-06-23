@@ -1,11 +1,17 @@
 name: deploy-to-cloud-run
 on: [push]
 
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: '${{ secrets.GCP_CREDENTIALS }}'
+
 jobs:
   gcloud-setup:
     runs-on: ubuntu-latest
     environment: dev
     steps:
+    - name: 'Checkout source code'
+      uses: 'actions/checkout@v3'
+
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
       with:
@@ -14,12 +20,7 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
 
-    - name: 'Checkout source code'
-      uses: 'actions/checkout@v3'
-
     - name: 'Build and push image to GCP Artefact Registry'
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: '${{ secrets.GCP_CREDENTIALS }}'
       run: 'gcloud builds submit --tag ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/containers/o11y_trace_receiver .'
 
       
