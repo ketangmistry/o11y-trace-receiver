@@ -1,6 +1,9 @@
 name: deploy-to-cloud-run
 on: [push]
 
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: '${{secrets.GCP_CREDENTIALS}}'
+
 jobs:
   gcloud-setup:
     runs-on: ubuntu-latest
