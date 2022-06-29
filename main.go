@@ -1,28 +1,56 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+
+	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsublite/pscompat"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
+func traces(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
+	topicPath := os.Getenv("PUBSUB_TOPIC")
 
-	fmt.Fprintf(w, "hello\n")
-}
-
-func headers(w http.ResponseWriter, req *http.Request) {
-
-	for name, headers := range req.Header {
-		for _, h := range headers {
-			fmt.Fprintf(w, "%v: %v\n", name, h)
-		}
+	b, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		// TODO: Handle error.
 	}
+
+	publisher, err := pscompat.NewPublisherClient(ctx, topicPath)
+	if err != nil {
+		// TODO: Handle error.
+	}
+
+	result := publisher.Publish(ctx, &pubsub.Message{Data: []byte(b)})
+
+	id, err := result.Get(ctx)
+	if err != nil {
+		// TODO: Handle error.
+	}
+
+	publisher.Stop()
+
+	fmt.Printf("%s", id)
 }
 
 func main() {
 
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/headers", headers)
+	app, err := newrelic.NewApplication(
+		newrelic.ConfigAppName("o11y-trace-receiver"),
+		newrelic.ConfigLicense(os.Getenv("NR_INGEST_LICENSE_KEY")),
+		newrelic.ConfigDistributedTracerEnabled(true),
+	)
+	if err != nil {
+		// TODO: Handle error.
+	}
+
+	http.HandleFunc(newrelic.WrapHandleFunc(app, "/v1/traces", traces))
 
 	http.ListenAndServe(":8090", nil)
 }
