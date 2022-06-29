@@ -19,19 +19,19 @@ func traces(w http.ResponseWriter, req *http.Request) {
 
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		// TODO: Handle error.
+		// TODO: Handle error - should continue but show error
 	}
 
 	publisher, err := pscompat.NewPublisherClient(ctx, topicPath)
 	if err != nil {
-		// TODO: Handle error.
+		// TODO: Handle error  - should continue but show error
 	}
 
 	result := publisher.Publish(ctx, &pubsub.Message{Data: []byte(b)})
 
 	id, err := result.Get(ctx)
 	if err != nil {
-		// TODO: Handle error.
+		// TODO: Handle error  - should continue but show error
 	}
 
 	publisher.Stop()
@@ -47,7 +47,7 @@ func main() {
 		newrelic.ConfigDistributedTracerEnabled(true),
 	)
 	if err != nil {
-		// TODO: Handle error.
+		// TODO: Handle error -  - should continue but show error
 	}
 
 	http.HandleFunc(newrelic.WrapHandleFunc(app, "/v1/traces", traces))
