@@ -1,3 +1,3 @@
-# o11y_trace_receiver
+# o11y-trace-receiver
 
 Trace receiver hosted on GCP Cloud Run.
